@@ -721,7 +721,7 @@ export const mcqPapers: Paper[] = [
   // ===========================================================================
   {
     id: "1-identidades-m3",
-    title: "MCQ Paper 3: Registro C1, RAE e identidad crítica [SL & HL]",
+    title: "MCQ Set 3: Registro C1, RAE e identidad crítica [SL & HL]",
     level: "HL",
     questions: [
       {

@@ -707,7 +707,7 @@ export const mcqPapers: Paper[] = [
   },
   {
     id: "3-ingenio-humano-m3",
-    title: "MCQ Paper 3: [HL] AI Ethics, Media Bias, Censorship & C1 Mastery",
+    title: "MCQ Set 3: [HL] AI Ethics, Media Bias, Censorship & C1 Mastery",
     level: "HL",
     questions: [
       {

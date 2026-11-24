@@ -751,7 +751,7 @@ export const mcqPapers: Paper[] = [
   // ===========================================================================
   {
     id: "8-hl-literature-m3",
-    title: "MCQ Paper 3 · Extract-to-Theme Bridges & FA2029 HL IO Criteria (HL)",
+    title: "MCQ Set 3 · Extract-to-Theme Bridges & FA2029 HL IO Criteria (HL)",
     level: "HL",
     questions: [
       {

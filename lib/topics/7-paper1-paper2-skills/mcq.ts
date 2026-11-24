@@ -747,7 +747,7 @@ export const mcqPapers: Paper[] = [
   // ===========================================================================
   {
     id: "7-paper1-paper2-skills-m3",
-    title: "MCQ Paper 3 · [HL] Proofreading Sweep & Band 10–12 Calibration",
+    title: "MCQ Set 3 · [HL] Proofreading Sweep & Band 10–12 Calibration",
     level: "HL",
     questions: [
       {

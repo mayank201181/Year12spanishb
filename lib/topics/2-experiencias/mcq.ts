@@ -737,7 +737,7 @@ export const mcqPapers: Paper[] = [
   },
   {
     id: "2-experiencias-m3",
-    title: "MCQ Paper 3 — [HL] Testimony, Cultural Hybridity & Past Subjunctive",
+    title: "MCQ Set 3 — [HL] Testimony, Cultural Hybridity & Past Subjunctive",
     level: "HL",
     questions: [
       {

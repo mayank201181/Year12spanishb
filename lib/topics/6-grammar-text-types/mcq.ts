@@ -683,7 +683,7 @@ export const mcqPapers: Paper[] = [
   // =========================================================================
   {
     id: "6-grammar-text-types-m3",
-    title: "MCQ Paper 3 · Past Tenses, Si-Clauses & [HL] C1 Cohesion",
+    title: "MCQ Set 3 · Past Tenses, Si-Clauses & [HL] C1 Cohesion",
     level: "HL",
     questions: [
       {

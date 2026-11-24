@@ -707,7 +707,7 @@ export const mcqPapers: Paper[] = [
   },
   {
     id: "4-organizacion-social-m3",
-    title: "MCQ Paper 3 · Policy Proposals, Structural Mobility & C1 Precision (SL/HL)",
+    title: "MCQ Set 3 · Policy Proposals, Structural Mobility & C1 Precision (SL/HL)",
     level: "HL",
     questions: [
       {

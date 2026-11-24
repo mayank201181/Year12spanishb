@@ -718,7 +718,7 @@ export const mcqPapers: Paper[] = [
   // ===========================================================================
   {
     id: "5-compartir-el-planeta-m3",
-    title: "MCQ Paper 3 — [HL] Global Ethics, C1 Cohesion & Counter-Argumentation",
+    title: "MCQ Set 3 — [HL] Global Ethics, C1 Cohesion & Counter-Argumentation",
     level: "HL",
     questions: [
       {
