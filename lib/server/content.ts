@@ -53,6 +53,8 @@ export interface TopicSummary {
   title: string;
   strand: string;
   icon: string;
+  dpYear: 1 | 2;
+  dpOrder: number;
   level: IBLevel;
   summary: string;
   ready: boolean;
@@ -72,6 +74,8 @@ export function topicSummaries(): TopicSummary[] {
       title: m.title,
       strand: m.strand,
       icon: m.icon,
+      dpYear: m.dpYear,
+      dpOrder: m.dpOrder,
       level: m.level,
       summary: t?.summary ?? "",
       ready: !!t,

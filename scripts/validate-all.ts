@@ -19,6 +19,10 @@ function run(script: string, arg: string) {
   }
 }
 for (const t of TOPIC_META) {
+  if (t.dpYear !== 1 && t.dpYear !== 2) {
+    failed++;
+    console.log(`✗ missing/invalid dpYear for ${t.id}`);
+  }
   run("validate-topic.ts", t.id);
   if (existsSync(path.join(root, "lib", "drills", `${t.id}.ts`))) run("validate-drills.ts", t.id);
   else console.log(`· no drills yet for ${t.id}`);

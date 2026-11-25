@@ -8,6 +8,8 @@ import type { TopicSummary } from "@/lib/server/content";
 import { STRANDS } from "@/lib/topics/meta";
 import { useStore } from "@/lib/store";
 import { SUBJECT } from "@/lib/subject";
+import { useDpYearFilter } from "@/lib/dpYear";
+import { Dp1ReviewDivider, DpYearBanner } from "./DpYearBanner";
 import { TopicCard, STRAND_STYLES, strandStyle } from "./TopicCard";
 
 const ALL = "all";
@@ -121,6 +123,22 @@ export function TopicsBrowser({ summaries }: { summaries: TopicSummary[] }) {
   const filtered = strand !== ALL || terms.length > 0;
   const strandCount = STRANDS.filter((s) => counts[s]).length;
   const comingSoon = visibleSummaries.filter((s) => !s.ready).length;
+  const dp2 = useDpYearFilter() === 2;
+  const dp2AllCount = useMemo(() => visibleSummaries.filter((s) => s.dpYear === 2).length, [visibleSummaries]);
+  const dp1AllCount = visibleSummaries.length - dp2AllCount;
+  const { dp2Results, dp1Results } = useMemo(() => {
+    if (!dp2) return { dp2Results: [] as Result[], dp1Results: [] as Result[] };
+    const sorted = [...results].sort((a, b) => {
+      const sa = a.summary;
+      const sb = b.summary;
+      if (sa.dpYear !== sb.dpYear) return sb.dpYear - sa.dpYear;
+      return sa.dpOrder - sb.dpOrder;
+    });
+    return {
+      dp2Results: sorted.filter((r) => r.summary.dpYear === 2),
+      dp1Results: sorted.filter((r) => r.summary.dpYear !== 2),
+    };
+  }, [dp2, results]);
   const hiddenHlCount = summaries.length - visibleSummaries.length;
 
   function reset() {
@@ -133,6 +151,7 @@ export function TopicsBrowser({ summaries }: { summaries: TopicSummary[] }) {
 
   return (
     <div className="space-y-6">
+      {dp2 ? <DpYearBanner dp2Count={dp2AllCount} dp1Count={dp1AllCount} /> : null}
       <header>
         <h1 className="text-2xl font-black tracking-tight sm:text-3xl">All {SUBJECT.shortName} topics</h1>
         <p className="mt-1 text-ink-2">
@@ -209,27 +228,81 @@ export function TopicsBrowser({ summaries }: { summaries: TopicSummary[] }) {
 
       {/* ------------------------------------------------ grid */}
       {results.length > 0 ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {results.map(({ summary, sections }) => (
-            <TopicCard key={summary.id} summary={summary} headingLevel={2}>
-              {summary.ready && sections.length > 0 ? (
-                <div className="border-t border-line pt-2">
-                  <p className="text-xs font-bold text-ink-2">Matching lessons</p>
-                  <ul className="mt-1 space-y-0.5">
-                    {sections.map((x) => (
-                      <li key={x.id}>
-                        <Link href={`/topic/${summary.id}?tab=learn#sec-${x.id}`} className="inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:underline">
-                          {x.heading}
-                          {x.stretch ? <span className="ml-1.5 text-xs font-bold text-ink-2">(stretch)</span> : null}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
+        dp2 ? (
+          <div className="space-y-6">
+            {dp2Results.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {dp2Results.map(({ summary, sections }) => (
+                  <TopicCard key={summary.id} summary={summary} headingLevel={2} dpYearBadge={2}>
+                    {summary.ready && sections.length > 0 ? (
+                      <div className="border-t border-line pt-2">
+                        <p className="text-xs font-bold text-ink-2">Matching lessons</p>
+                        <ul className="mt-1 space-y-0.5">
+                          {sections.map((x) => (
+                            <li key={x.id}>
+                              <Link href={`/topic/${summary.id}?tab=learn#sec-${x.id}`} className="inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:underline">
+                                {x.heading}
+                                {x.stretch ? <span className="ml-1.5 text-xs font-bold text-ink-2">(stretch)</span> : null}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </TopicCard>
+                ))}
+              </div>
+            ) : null}
+            {dp1Results.length > 0 ? (
+              <>
+                <Dp1ReviewDivider count={dp1Results.length} />
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {dp1Results.map(({ summary, sections }) => (
+                    <TopicCard key={summary.id} summary={summary} headingLevel={2} dpYearBadge={1} dimmed>
+                      {summary.ready && sections.length > 0 ? (
+                        <div className="border-t border-line pt-2">
+                          <p className="text-xs font-bold text-ink-2">Matching lessons</p>
+                          <ul className="mt-1 space-y-0.5">
+                            {sections.map((x) => (
+                              <li key={x.id}>
+                                <Link href={`/topic/${summary.id}?tab=learn#sec-${x.id}`} className="inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:underline">
+                                  {x.heading}
+                                  {x.stretch ? <span className="ml-1.5 text-xs font-bold text-ink-2">(stretch)</span> : null}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                    </TopicCard>
+                  ))}
                 </div>
-              ) : null}
-            </TopicCard>
-          ))}
-        </div>
+              </>
+            ) : null}
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {results.map(({ summary, sections }) => (
+              <TopicCard key={summary.id} summary={summary} headingLevel={2}>
+                {summary.ready && sections.length > 0 ? (
+                  <div className="border-t border-line pt-2">
+                    <p className="text-xs font-bold text-ink-2">Matching lessons</p>
+                    <ul className="mt-1 space-y-0.5">
+                      {sections.map((x) => (
+                        <li key={x.id}>
+                          <Link href={`/topic/${summary.id}?tab=learn#sec-${x.id}`} className="inline-flex min-h-10 items-center text-sm font-semibold text-brand hover:underline">
+                            {x.heading}
+                            {x.stretch ? <span className="ml-1.5 text-xs font-bold text-ink-2">(stretch)</span> : null}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </TopicCard>
+            ))}
+          </div>
+        )
       ) : (
         <div className="card flex flex-col items-center gap-2 p-8 text-center">
           <span aria-hidden className="text-4xl">

@@ -3,6 +3,8 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { TopicCramPack } from "@/lib/cram";
+import { sortForDp2, topicDpYear, useDpYearFilter } from "@/lib/dpYear";
+import { Dp1ReviewDivider, DpYearBanner } from "./DpYearBanner";
 import { SUBJECT } from "@/lib/subject";
 import { useStore } from "@/lib/store";
 import { Rich, RichInline } from "./Rich";
@@ -144,9 +146,14 @@ export function CramSheet({
 
   const strands = useMemo(() => Array.from(new Set(levelPacks.map((p) => p.strand).filter(Boolean))), [levelPacks]);
 
+  const dp2 = useDpYearFilter() === 2 && !singleTopicMode;
+  const orderedPacks = useMemo(() => (dp2 ? sortForDp2(levelPacks) : levelPacks), [dp2, levelPacks]);
+  const dp2PackCount = useMemo(() => levelPacks.filter((p) => topicDpYear(p.id) === 2).length, [levelPacks]);
+  const dp1PackCount = levelPacks.length - dp2PackCount;
+
   const qNorm = query.trim().toLowerCase();
   const visiblePacks = useMemo(() => {
-    return levelPacks.filter((p) => {
+    return orderedPacks.filter((p) => {
       if (!selectedIds.has(p.id)) return false;
       if (!qNorm) return true;
       const hay = [
@@ -163,7 +170,7 @@ export function CramSheet({
         .toLowerCase();
       return hay.includes(qNorm);
     });
-  }, [levelPacks, selectedIds, qNorm]);
+  }, [orderedPacks, selectedIds, qNorm]);
 
   const totalMistakes = visiblePacks.reduce((s, p) => s + p.examMistakes.length + p.questionTraps.length, 0);
   const totalMustKnow = visiblePacks.reduce((s, p) => s + p.mustKnow.length, 0);
@@ -171,6 +178,7 @@ export function CramSheet({
 
   return (
     <div className="space-y-6 pb-8">
+      {dp2 ? <DpYearBanner dp2Count={dp2PackCount} dp1Count={dp1PackCount} /> : null}
       {!singleTopicMode ? (
         <header className="card space-y-4 p-5 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -216,8 +224,9 @@ export function CramSheet({
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {levelPacks.map((p) => {
+              {orderedPacks.map((p) => {
                 const active = selectedIds.has(p.id);
+                const isDp1 = dp2 && topicDpYear(p.id) !== 2;
                 return (
                   <button
                     key={p.id}
@@ -225,10 +234,15 @@ export function CramSheet({
                     onClick={() => toggleTopic(p.id)}
                     className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all ${
                       active ? "border-brand bg-brand text-white shadow-sm" : "border-line bg-surface text-ink-2 hover:border-brand/50 hover:text-ink"
-                    }`}
+                    } ${isDp1 ? "opacity-60 hover:opacity-95" : ""}`}
                   >
                     <span aria-hidden>{p.icon}</span>
                     <span>{p.title}</span>
+                    {dp2 ? (
+                      <span className={`rounded px-1 text-[10px] ${active ? "bg-white/20" : "bg-surface-2 text-ink-2"}`}>
+                        DP{topicDpYear(p.id)}
+                      </span>
+                    ) : null}
                     {active ? <span aria-hidden>✓</span> : null}
                   </button>
                 );
@@ -300,8 +314,22 @@ export function CramSheet({
       ) : null}
 
       <div className="space-y-8">
-        {visiblePacks.map((pack) => (
-          <article key={pack.id} className="card space-y-6 overflow-hidden p-5 sm:p-6 print:shadow-none">
+        {visiblePacks.map((pack, idx) => {
+          const packDp = dp2 ? topicDpYear(pack.id) : undefined;
+          const prevDp = dp2 && idx > 0 ? topicDpYear(visiblePacks[idx - 1].id) : undefined;
+          const showDivider = dp2 && packDp === 1 && (idx === 0 || prevDp === 2);
+          const remainingDp1 = showDivider ? visiblePacks.filter((x) => topicDpYear(x.id) === 1).length : 0;
+          return (
+          <div key={pack.id} className={showDivider ? "space-y-6" : undefined}>
+          {showDivider ? <Dp1ReviewDivider count={remainingDp1} /> : null}
+          <article
+            data-dp-year-item={packDp}
+            className={
+              packDp === 1
+                ? "card space-y-6 overflow-hidden p-5 sm:p-6 print:shadow-none opacity-60 grayscale-[30%] transition-opacity hover:opacity-100"
+                : "card space-y-6 overflow-hidden p-5 sm:p-6 print:shadow-none"
+            }
+          >
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
               <div className="flex items-center gap-3">
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-2xl" aria-hidden>
@@ -309,6 +337,11 @@ export function CramSheet({
                 </span>
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-brand">{pack.strand}</span>
+                  {packDp ? (
+                    <span className={`mb-0.5 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${packDp === 2 ? "bg-brand text-brand-ink" : "bg-surface-2 text-ink-2"}`}>
+                      DP{packDp}
+                    </span>
+                  ) : null}
                   <h2 className="text-xl font-black sm:text-2xl">{pack.title}</h2>
                 </div>
               </div>
@@ -465,7 +498,9 @@ export function CramSheet({
               </section>
             ) : null}
           </article>
-        ))}
+          </div>
+          );
+        })}
       </div>
     </div>
   );

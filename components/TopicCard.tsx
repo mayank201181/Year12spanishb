@@ -137,6 +137,8 @@ export function TopicCard({
   summary,
   headingLevel = 3,
   showStrand = true,
+  dpYearBadge,
+  dimmed = false,
   children,
 }: {
   summary: TopicSummary;
@@ -144,6 +146,10 @@ export function TopicCard({
   headingLevel?: 2 | 3 | 4;
   /** Show the strand name above the title (hide it when already grouped by strand). */
   showStrand?: boolean;
+  /** Optional DP1/DP2 badge shown only when ?dp=2 filter is active. */
+  dpYearBadge?: 1 | 2;
+  /** Softly dim DP1 review cards when ?dp=2 filter is active (never locks or hides). */
+  dimmed?: boolean;
   /** Extra content under the card (links inside stay clickable above the card link). */
   children?: ReactNode;
 }) {
@@ -177,7 +183,14 @@ export function TopicCard({
   }
 
   return (
-    <article className="card group relative flex flex-col gap-3 overflow-hidden p-4 pl-5 transition duration-150 hover:-translate-y-0.5 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0 has-[.topic-link:focus-visible]:ring-2 has-[.topic-link:focus-visible]:ring-brand">
+    <article
+      data-dp-year-item={dpYearBadge}
+      className={
+        dimmed
+          ? "card group relative flex flex-col gap-3 overflow-hidden p-4 pl-5 opacity-60 grayscale-[35%] transition duration-150 hover:-translate-y-0.5 hover:opacity-95 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0 has-[.topic-link:focus-visible]:ring-2 has-[.topic-link:focus-visible]:ring-brand"
+          : "card group relative flex flex-col gap-3 overflow-hidden p-4 pl-5 transition duration-150 hover:-translate-y-0.5 hover:shadow-lg motion-reduce:transition-none motion-reduce:hover:translate-y-0 has-[.topic-link:focus-visible]:ring-2 has-[.topic-link:focus-visible]:ring-brand"
+      }
+    >
       <span aria-hidden className={`absolute inset-y-0 left-0 w-1.5 ${style.bg}`} />
       <div className="flex items-start gap-3">
         <span aria-hidden className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-2xl ${style.soft}`}>
@@ -194,11 +207,21 @@ export function TopicCard({
             {/* The link's ::after covers the whole card, so the card is one big target; the ring shows on the card. */}
             <Link href={`/topic/${summary.id}`} className="topic-link outline-none after:absolute after:inset-0 after:z-0">
               {summary.title}
-              <span className="sr-only">{` — ${cta}. ${spoken}${focus ? ". Focus topic" : ""}`}</span>
+              <span className="sr-only">{` — ${cta}. ${spoken}${focus ? ". Focus topic" : ""}${dpYearBadge ? `. DP${dpYearBadge}` : ""}`}</span>
             </Link>
           </Heading>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1">
+          {dpYearBadge ? (
+            <span
+              className={`chip border-0 text-[0.7rem] ${
+                dpYearBadge === 2 ? "bg-brand text-brand-ink" : "bg-surface-2 text-ink-2"
+              }`}
+              aria-hidden
+            >
+              DP{dpYearBadge}
+            </span>
+          ) : null}
           {summary.level === "HL" ? (
             <span className="chip border-0 bg-accent-soft text-warn text-[0.7rem]">HL Only</span>
           ) : summary.sections.some((s) => s.level === "HL") ? (

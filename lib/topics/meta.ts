@@ -18,6 +18,10 @@ export interface TopicMeta {
   title: string;
   strand: Strand;
   icon: string;
+  /** Which IB Diploma year normally finishes this topic (1 = DP1 / Year 12, 2 = DP2 / Year 13). */
+  dpYear: 1 | 2;
+  /** Teaching/revision order used when ?dp=2 is active (DP2 first, then DP1). */
+  dpOrder: number;
   level: IBLevel;
   curriculum: string;
   sections: SectionPlan[];
@@ -37,6 +41,8 @@ export const TOPIC_META: TopicMeta[] = [
     title: "Theme 1: Identidades (Identities)",
     strand: "Prescribed Themes 1–3",
     icon: "🧬",
+    dpYear: 1,
+    dpOrder: 5,
     level: "SL",
     curriculum: "IB Spanish B FA2029 Brief — Prescribed Theme 1: Identidades (SL & HL)",
     sections: [
@@ -71,6 +77,8 @@ export const TOPIC_META: TopicMeta[] = [
     title: "Theme 2: Experiencias (Experiences)",
     strand: "Prescribed Themes 1–3",
     icon: "🧳",
+    dpYear: 1,
+    dpOrder: 6,
     level: "SL",
     curriculum: "IB Spanish B FA2029 Brief — Prescribed Theme 2: Experiencias (SL & HL)",
     sections: [
@@ -105,6 +113,8 @@ export const TOPIC_META: TopicMeta[] = [
     title: "Theme 3: Ingenio humano (Human Ingenuity)",
     strand: "Prescribed Themes 1–3",
     icon: "💡",
+    dpYear: 1,
+    dpOrder: 7,
     level: "SL",
     curriculum: "IB Spanish B FA2029 Brief — Prescribed Theme 3: Ingenio humano (SL & HL)",
     sections: [
@@ -141,6 +151,8 @@ export const TOPIC_META: TopicMeta[] = [
     title: "Theme 4: Organización social (Social Organization)",
     strand: "Prescribed Themes 4–5",
     icon: "🏛️",
+    dpYear: 2,
+    dpOrder: 1,
     level: "SL",
     curriculum: "IB Spanish B FA2029 Brief — Prescribed Theme 4: Organización social (SL & HL)",
     sections: [
@@ -175,6 +187,8 @@ export const TOPIC_META: TopicMeta[] = [
     title: "Theme 5: Compartir el planeta (Sharing the Planet)",
     strand: "Prescribed Themes 4–5",
     icon: "🌍",
+    dpYear: 2,
+    dpOrder: 2,
     level: "SL",
     curriculum: "IB Spanish B FA2029 Brief — Prescribed Theme 5: Compartir el planeta (SL & HL)",
     sections: [
@@ -211,6 +225,8 @@ export const TOPIC_META: TopicMeta[] = [
     title: "IB Grammar Mastery & Text-Type Conventions",
     strand: "Grammar & Text Types",
     icon: "⚙️",
+    dpYear: 1,
+    dpOrder: 8,
     level: "SL",
     curriculum: "IB Spanish B FA2029 Brief — Post-IGCSE B2–C1 Grammar & 3 Text-Type Categories",
     sections: [
@@ -247,6 +263,8 @@ export const TOPIC_META: TopicMeta[] = [
     title: "Paper 1 (Writing) & Paper 2 (Reading & Listening)",
     strand: "Exam Skills & HL Literature",
     icon: "📝",
+    dpYear: 2,
+    dpOrder: 3,
     level: "SL",
     curriculum: "IB Spanish B FA2029 Brief — External Assessment Mastery (75% Total)",
     sections: [
@@ -281,6 +299,8 @@ export const TOPIC_META: TopicMeta[] = [
     title: "HL Literature & Literary Extract Analysis (HL Only)",
     strand: "Exam Skills & HL Literature",
     icon: "🎭",
+    dpYear: 2,
+    dpOrder: 4,
     level: "HL",
     curriculum: "IB Spanish B FA2029 Brief — HL Component: 2 Studied Literary Works & HL Individual Oral",
     sections: [

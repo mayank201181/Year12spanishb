@@ -12,6 +12,8 @@ import { drillById } from "@/lib/drills";
 import { isRusty, rankFor, skillDue, skillLevel, topicOfQid } from "@/lib/learning";
 import { addDaysISO, dayDiff, localISO, todayISO, weekStartISO } from "@/lib/dates";
 import { SUBJECT } from "@/lib/subject";
+import { sortForDp2, useDpYearFilter } from "@/lib/dpYear";
+import { Dp1ReviewDivider, DpYearBanner } from "./DpYearBanner";
 import { ProgressBar, TopicCard, strandStyle } from "./TopicCard";
 
 const TOPIC_IDS = TOPIC_META.map((t) => t.id);
@@ -376,7 +378,11 @@ export function HomeDashboard({ summaries }: { summaries: TopicSummary[] }) {
   }, [data.srs, data.skills, today]);
 
   // ---- Tutor tip ----
-  const tip = useMemo(() => chooseTip(data, visibleSummaries, focusTopics, review.total, dailyDone), [data, visibleSummaries, focusTopics, review.total, dailyDone]);
+  const dp2 = useDpYearFilter() === 2;
+  const orderedForDp2 = useMemo(() => (dp2 ? sortForDp2(visibleSummaries) : visibleSummaries), [dp2, visibleSummaries]);
+  const dp2Topics = useMemo(() => orderedForDp2.filter((s) => s.dpYear === 2), [orderedForDp2]);
+  const dp1Topics = useMemo(() => orderedForDp2.filter((s) => s.dpYear !== 2), [orderedForDp2]);
+  const tip = useMemo(() => chooseTip(data, orderedForDp2, focusTopics, review.total, dailyDone), [data, orderedForDp2, focusTopics, review.total, dailyDone]);
 
   // ---- rank ----
   const { rank, next, progress } = rankFor(data.stars);
@@ -390,6 +396,7 @@ export function HomeDashboard({ summaries }: { summaries: TopicSummary[] }) {
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {dp2 ? <DpYearBanner dp2Count={dp2Topics.length} dp1Count={dp1Topics.length} /> : null}
       {/* ------------------------------------------------ greeting */}
       <header className="flex flex-wrap items-center gap-x-4 gap-y-3">
         <span aria-hidden className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-line bg-surface text-3xl shadow-sm">
@@ -735,7 +742,28 @@ export function HomeDashboard({ summaries }: { summaries: TopicSummary[] }) {
             Search all topics <span aria-hidden>&nbsp;→</span>
           </Link>
         </div>
-        {STRANDS.map((strand) => {
+        {dp2 ? (
+          <div className="space-y-6">
+            {dp2Topics.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {dp2Topics.map((s) => (
+                  <TopicCard key={s.id} summary={s} headingLevel={3} showStrand dpYearBadge={2} />
+                ))}
+              </div>
+            ) : null}
+            {dp1Topics.length > 0 ? (
+              <>
+                <Dp1ReviewDivider count={dp1Topics.length} />
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {dp1Topics.map((s) => (
+                    <TopicCard key={s.id} summary={s} headingLevel={3} showStrand dpYearBadge={1} dimmed />
+                  ))}
+                </div>
+              </>
+            ) : null}
+          </div>
+        ) : (
+          STRANDS.map((strand) => {
           const list = visibleSummaries.filter((s) => s.strand === strand);
           if (!list.length) return null;
           const st = strandStyle(strand);
@@ -754,7 +782,8 @@ export function HomeDashboard({ summaries }: { summaries: TopicSummary[] }) {
               </div>
             </section>
           );
-        })}
+        })
+        )}
       </section>
     </div>
   );
